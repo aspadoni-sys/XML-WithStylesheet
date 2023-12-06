@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trasformazione XSLT</title>
+</head>
+<body>
+  <h1>XML trasformato con XSLT</h1>
+  <div id="result"></div>
+
+  <script>
+    async function fetchAndTransform() {
+      try {
+        // Ottieni l'XML dall'API
+        const xmlResponse = await fetch('/getXml');
+        const xmlText = await xmlResponse.text();
+
+        // Ottieni l'XSL dall'API
+        const xslResponse = await fetch('/getXsl');
+        const xslText = await xslResponse.text();
+
+        // Esegui la trasformazione XSLT
+        const xmlDoc = new DOMParser().parseFromString(xmlText, 'text/xml');
+        const xslDoc = new DOMParser().parseFromString(xslText, 'text/xml');
+        const xsltProcessor = new XSLTProcessor();
+        xsltProcessor.importStylesheet(xslDoc);
+        const transformedDoc = xsltProcessor.transformToDocument(xmlDoc);
+
+        // Converti il documento trasformato in una stringa HTML
+        const transformedHtml = new XMLSerializer().serializeToString(transformedDoc);
+
+        // Mostra il risultato nella pagina
+        document.getElementById('result').innerHTML = transformedHtml;
+      } catch (error) {
+        console.error('Errore:', error.message);
+        document.getElementById('result').innerHTML = 'Errore durante la trasformazione';
+      }
+    }
+
+    // Esegui la trasformazione al caricamento della pagina
+    fetchAndTransform();
+  </script>
+</body>
+</html>
